@@ -2,10 +2,12 @@
 10^3 runs: {'Win': 658, 'Loss': 342}
 10^4 runs: {'Win': 6589, 'Loss': 3411}
 10^5 runs: {'Win': 66407, 'Loss': 33593}
-10^6 runs: {'Win': 666349, 'Loss': 333651}"""
+10^6 runs: {'Win': 666349, 'Loss': 333651}
+10^7 runs: {'Win': 6666936, 'Loss': 3333064}"""
 
 import numpy as np
 from collections import Counter
+from multiprocessing import Pool
 
 def play_game():
     door_nums = list(range(3))
@@ -26,15 +28,27 @@ def play_game():
         return 'Loss'
 
 
-def run_simulation():
-    total_trials = 10**6
+def run_simulation(trials):
+    results = []
+    for _ in range(trials):
+        results.append(play_game())
+    return results
+
+
+def parallelize_simulations():
+    total_trials = 10**9
+    split = [10**4] * (10**4)
+
+    proc_pool = Pool(processes=10, maxtasksperchild=10)
+    sim_split_runs = proc_pool.map(run_simulation, split)
+    proc_pool.close(), proc_pool.join()
 
     results = []
-    for _ in range(total_trials):
-        results.append(play_game())
+    for sim in sim_split_runs:
+        results.extend(sim)
 
     print(Counter(results))
 
 
 if __name__ == '__main__':
-    run_simulation()
+    parallelize_simulations()
