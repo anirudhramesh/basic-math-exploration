@@ -1,5 +1,6 @@
 import pandas as pd
-from numpy import arange as range
+from numpy import arange
+from itertools import product
 
 MAX_ITERATIONS = 1000
 
@@ -15,5 +16,11 @@ def mandelbrot(c, limit):
 
 limit = 5
 step = 0.1
-frame = pd.DataFrame([complex(x,y) for x in range(-limit, limit, step) for y in range(-limit, limit, step)], columns=['Coordinates'])
-frame.loc[:, 'Iterations'] = frame.Coordinates.apply(mandelbrot, args=(limit, ))
+coefficients = product(arange(-limit, limit, step), repeat=2)
+
+frame = pd.DataFrame([complex(x[0], x[1]) for x in coefficients], columns=['Coordinates'])
+# below does not work because you cannot pass list of tuples to map as arguments. You have to pass iterable of n lists
+# where n = number of arguments; so list 1 contains all the first arguments, list 2 all the second arguments etc etc
+# frame = pd.DataFrame(map(complex, coefficients), columns=['Coordinates'])
+frame.loc[:, 'Iterations'] = frame.Coordinates.apply(mandelbrot, args=(limit*10, ))
+pass
