@@ -1,11 +1,13 @@
 import pandas as pd
 from numpy import arange
 from itertools import product
+from matplotlib import pyplot as plt
 
-MAX_ITERATIONS = 1000
+MAX_ITERATIONS = 10000
 
 
 def mandelbrot(c, limit):
+    c = complex(c['x'], c['y'])
     z = 0
     count = 0
     while abs(z) <= limit and count < MAX_ITERATIONS:
@@ -18,9 +20,11 @@ limit = 5
 step = 0.1
 coefficients = product(arange(-limit, limit, step), repeat=2)
 
-frame = pd.DataFrame([complex(x[0], x[1]) for x in coefficients], columns=['Coordinates'])
+frame = pd.DataFrame(coefficients, columns=['x', 'y'])
 # below does not work because you cannot pass list of tuples to map as arguments. You have to pass iterable of n lists
 # where n = number of arguments; so list 1 contains all the first arguments, list 2 all the second arguments etc etc
 # frame = pd.DataFrame(map(complex, coefficients), columns=['Coordinates'])
-frame.loc[:, 'Iterations'] = frame.Coordinates.apply(mandelbrot, args=(limit*10, ))
-pass
+frame.loc[:, 'Iterations'] = frame[['x', 'y']].apply(mandelbrot, axis=1, args=(limit*100, ))
+
+plt.scatter(frame['x'], frame['y'], s=frame['Iterations'], cmap='Greens')
+plt.show()
