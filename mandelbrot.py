@@ -1,5 +1,5 @@
 import pandas as pd
-from numpy import arange
+import numpy as np
 from itertools import product
 from matplotlib import pyplot as plt
 
@@ -17,8 +17,8 @@ def mandelbrot(c, limit_):
 
 
 limit = 5
-step = 0.02
-coefficients = product(arange(-limit, limit, step), repeat=2)
+step = 0.05
+coefficients = product(np.arange(-limit, limit, step), repeat=2)
 
 frame = pd.DataFrame(coefficients, columns=['x', 'y'])
 # below does not work because you cannot pass list of tuples to map as arguments. You have to pass iterable of n lists
@@ -26,7 +26,6 @@ frame = pd.DataFrame(coefficients, columns=['x', 'y'])
 # frame = pd.DataFrame(map(complex, coefficients), columns=['Coordinates'])
 frame.loc[:, 'Iterations'] = frame[['x', 'y']].apply(mandelbrot, axis=1, args=(limit*10, ))
 
-plt.figure(figsize=(100, 120))
-plt.scatter(frame['x'], frame['y'], c=frame['Iterations'], cmap='Greens')
-plt.savefig('mandelbrot_plot.png')
-# plt.show()
+fig, ax = plt.subplots(figsize=(10, 12))
+ax.scatter(frame['x'], frame['y'], c=frame['Iterations'], cmap='Greens')
+fig.savefig('mandelbrot_plot.png')
